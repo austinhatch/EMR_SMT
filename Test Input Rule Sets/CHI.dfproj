@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<rules>
+<!--##CHI Rules: All CHI Numbers are Different-->
+<rule enabled="true" name="AllDiff" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.chi"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>allDiff(from(SERUMS.USTAN.general), SERUMS.USTAN.general.chi)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- Building a CHI 10th Digit is between 0 & 9 -->
+<rule enabled="true" name="D10" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.D10"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>0 &lt;= SERUMS.USTAN.general.D10 &lt;= 9</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- Building a CHI - 7th Digit is between 0 & 9 -->
+<rule enabled="true" name="D7" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.D7"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>0 &lt;= SERUMS.USTAN.general.D7 &lt;= 9</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!-- Building a CHI - 8th Digit is between 0 & 9 -->
+<rule enabled="true" name="D8" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.D8"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>0 &lt;= SERUMS.USTAN.general.D8 &lt;= 9</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!-- Building a CHI - 9th Digit is even if Female, Odd if Male -->
+<rule enabled="true" name="D9" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.D9"/>
+<column id="SERUMS.USTAN.general.gender"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.D9 = (SERUMS.USTAN.general.gender == 2 ? {0,2,4,6,8} : {1,3,5,7,9})</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- CHI Generation - chi is the concatenation of the dob, D7, D8, D9, and D10 -->
+<rule enabled="true" name="chi_generation" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.D10"/>
+<column id="SERUMS.USTAN.general.D7"/>
+<column id="SERUMS.USTAN.general.D8"/>
+<column id="SERUMS.USTAN.general.D9"/>
+<column id="SERUMS.USTAN.general.chi"/>
+<column id="SERUMS.USTAN.general.dob"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.chi = concat(dateToString(SERUMS.USTAN.general.dob, dd/mm/yy), intToString(SERUMS.USTAN.general.D7), intToString(SERUMS.USTAN.general.D8), intToString(SERUMS.USTAN.general.D9), intToString(SERUMS.USTAN.general.D10))</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+</rules>

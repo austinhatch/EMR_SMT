@@ -1,0 +1,1044 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- links cycles to regimes via intention and CHI -->
+<rule enabled="true" name="FromRegimes" type="Constraint Rule">
+<description/>
+<columns>
+<sources>
+<column id="src2.USTAN.regimes.chi"/>
+<column id="src2.USTAN.regimes.intention"/>
+</sources>
+<targets>
+<column id="SERUMS.USTAN.cycles.chi"/>
+<column id="SERUMS.USTAN.cycles.intention"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>reuseData((SERUMS.USTAN.cycles.intention = src2.USTAN.regimes.intention) and (SERUMS.USTAN.cycles.chi = src2.USTAN.regimes.chi), RANDOM)</constraint>
+<properties>
+<enum name="Strategy" value="RANDOM">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+
+<!--Defines rules for her2_status given er_status based on randomWeightedValue-->
+<rule enabled="true" name="HER2_status" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr06s.er_status"/>
+<column id="SERUMS.USTAN.smr06s.her2_status"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.smr06s.her2_status =
+  (SERUMS.USTAN.smr06s.er_status == 0 ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.her2_status,
+      199 ? 0,
+      57 ? 1
+    ),
+  SERUMS.USTAN.smr06s.er_status == 1 ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.her2_status,
+      555 ? 0,
+      102 ? 1,
+      35? 9
+    ) : randomWeightedValue(SERUMS.USTAN.smr06s.her2_status,
+      80 ? 0,
+      8 ? 9
+    ))</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<rules>
+<!--If there is a metastasis1 for the patient, their cancer_flag = 6, if not their cancer_flag = 2 -->
+<rule enabled="true" name="cancer_flag" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.cancer_flag"/>
+<column id="SERUMS.USTAN.general.metastasis1"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.cancer_flag = (SERUMS.USTAN.general.metastasis1 isNot NULL ? 6 : 2)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--Assigns the m stage clinical_m based on a randomWeightedValue conditional on the n stage clinical_n -->
+<rule enabled="true" name="clinical_m" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr06s.clinical_m"/>
+<column id="SERUMS.USTAN.smr06s.clinical_n"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.smr06s.clinical_m = (
+  SERUMS.USTAN.smr06s.clinical_n == s'0' ?
+    randomWeightedValue (SERUMS.USTAN.smr06s.clinical_m,
+      268 ? s'0',
+      73 ? s'1',
+      44 ? s'X'
+    ),
+  SERUMS.USTAN.smr06s.clinical_n == s'1' ?
+    randomWeightedValue (SERUMS.USTAN.smr06s.clinical_m,
+      153 ? s'1',
+      114 ? s'0',
+      58 ? s'X'
+    ),
+  SERUMS.USTAN.smr06s.clinical_n == s'2' ?
+    randomWeightedValue (SERUMS.USTAN.smr06s.clinical_m,
+      27 ? s'1',
+      13 ? s'X',
+      6 ? s'0'
+    ),
+  SERUMS.USTAN.smr06s.clinical_n == s'3' ?
+    randomWeightedValue (SERUMS.USTAN.smr06s.clinical_m,
+      39 ? s'1',
+      12 ? s'0',
+      3 ? s'X'
+    ):  randomWeightedValue (SERUMS.USTAN.smr06s.clinical_m,
+      108 ? s'X',
+      90 ? s'1',
+      26? s'0'
+    )
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- Assigns the n stage clinical_n based on a randomWeightedValue conditional on the t stage clinical_t -->
+<rule enabled="true" name="clinical_n" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr06s.clinical_n"/>
+<column id="SERUMS.USTAN.smr06s.clinical_t"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.smr06s.clinical_n = (
+  SERUMS.USTAN.smr06s.clinical_t == s'1' ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.clinical_n,
+      128 ? s'0',
+      43 ? s'1',
+      30? s'X',
+      3? s'3'
+    ),
+  SERUMS.USTAN.smr06s.clinical_t == s'2'  ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.clinical_n,
+      190 ? s'0',
+      118 ? s'1',
+      62? s'X',
+      12? s'3',
+      9? s'2'
+    ),
+  SERUMS.USTAN.smr06s.clinical_t == s'3' ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.clinical_n,
+      51 ? s'1',
+      28 ? s'0',
+      19? s'X',
+      6? s'2',
+      3? s'3'
+    ),
+  SERUMS.USTAN.smr06s.clinical_t == s'4' ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.clinical_n,
+      98 ? s'1',
+      52 ? s'X',
+      33? s'3',
+      28? s'2',
+      27? s'0'
+    ) :  randomWeightedValue(SERUMS.USTAN.smr06s.clinical_n,
+      61 ? s'X',
+      15 ? s'1',
+      12? s'0',
+      3? s'2',
+      3? s'3'
+  ))</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- clinical_t_det is a modified form of clinical_t if clinical_t = 1 or 4-->
+<rule enabled="true" name="clinical_t_det" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr06s.clinical_t"/>
+<column id="SERUMS.USTAN.smr06s.clinical_t_det"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.smr06s.clinical_t_det = (
+  SERUMS.USTAN.smr06s.clinical_t == s'1' ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.clinical_t_det,
+      133 ? s'1c',
+      32 ? s'1b',
+      27? s'1',
+      9? s'1a'
+    ),
+  SERUMS.USTAN.smr06s.clinical_t == s'4'  ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.clinical_t_det,
+      151 ? s'4b',
+      42 ? s'4d',
+      30? s'4',
+      15? s'4c'
+    ) : SERUMS.USTAN.smr06s.clinical_t)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- clinical_n_det is a modified form of clinical_n if clinical_n = 2 or 3 -->
+<rule enabled="true" name="clinical_n_det" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr06s.clinical_n"/>
+<column id="SERUMS.USTAN.smr06s.clinical_n_det"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.smr06s.clinical_n_det = (
+  SERUMS.USTAN.smr06s.clinical_n == s'2' ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.clinical_n_det,
+      37 ? s'2',
+      6 ? s'2a',
+      3? s'2b'
+    ),
+  SERUMS.USTAN.smr06s.clinical_n == s'3'  ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.clinical_n_det,
+      30 ? s'3',
+      18 ? s'3c',
+      3? s'3a',
+      3? s'3b'
+    ) : SERUMS.USTAN.smr06s.clinical_n)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- creates the death_flag based on stage-->
+<rule enabled="true" name="death_flag" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.death_flag"/>
+<column id="SERUMS.USTAN.general.stage"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.death_flag = (
+  SERUMS.USTAN.general.stage == 1 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.death_flag,
+      2135 ? 0,
+      13 ? 1
+    ),
+  SERUMS.USTAN.general.stage == 2 ?
+    randomWeightedValue (
+     SERUMS.USTAN.general.death_flag,
+      1841 ? 0,
+      36 ? 1
+    ),
+  SERUMS.USTAN.general.stage == 3 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.death_flag,
+      403 ? 0,
+      21 ? 1
+    ),
+ SERUMS.USTAN.general.stage == 4 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.death_flag,
+      184 ? 0,
+      64 ? 1
+    ),
+  SERUMS.USTAN.general.stage == 9 ?
+    randomWeightedValue (
+     SERUMS.USTAN.general.death_flag,
+      340 ? 0,
+      44 ? 1
+    ): 0
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--the three metastasis sites must be different-->
+<rule enabled="true" name="diff_metastasis_all" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.metastasis1"/>
+<column id="SERUMS.USTAN.general.metastasis2"/>
+<column id="SERUMS.USTAN.general.metastasis3"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>allDiff(i, items({metastasis1, metastasis2, metastasis3}), SERUMS.USTAN.general.i)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- fills in the intention's first_regime based on the intention and a randomWeightedValue -->
+<rule enabled="true" name="first_regime" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.first_regime"/>
+<column id="SERUMS.USTAN.intentions.intention"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.first_regime =
+  (SERUMS.USTAN.intentions.intention = s'Neo-Adjuvant' ? randomWeightedValue(SERUMS.USTAN.intentions.first_regime,
+    5 ? s'DOCETAXEL&amp;CARBO',
+    7 ? s'DOCETAXEL&amp;CYCLO',
+    8 ? s'EPI/CYCLO ADJ',
+    17 ? s'FEC-D NEO (D)',
+    184 ? s'FEC-D NEO (FEC)',
+    9 ? s'PACLITAX WKLY'),
+  SERUMS.USTAN.intentions.intention = s'Adjuvant' ? randomWeightedValue(SERUMS.USTAN.intentions.first_regime,
+    56 ? s'DOCETAXEL&amp;CYCLO',
+    17 ? s'EPI/CYCLO ADJ',
+    163 ? s'FEC 80',
+    154 ? s'FEC-D (D)',
+    172 ? s'FEC-D (FEC)',
+    52 ? s'PACLITAX WKLY'),
+  SERUMS.USTAN.intentions.intention = s'Palliative' ? randomWeightedNumber(
+  24 ? s'DOCETAXEL BREAST',
+  31 ? s'EPI/CYCLO MET',
+  85 ? s'PACLITAX WKLY',
+  4 ? s'VINORELBINE IV 1',
+  3 ? s'VINORELBINE IV 2',
+  5 ? s'VINORELBINE PO 1'))
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- if any of the metastasis locations is C.22 then liver_flag = 3, if not it is based on a randomWeightedValue -->
+<rule enabled="true" name="liver_flag" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.liver_flag"/>
+<column id="SERUMS.USTAN.general.metastasis1"/>
+<column id="SERUMS.USTAN.general.metastasis2"/>
+<column id="SERUMS.USTAN.general.metastasis3"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.liver_flag = ((SERUMS.USTAN.general.metastasis1 = s'C22.0') or (SERUMS.USTAN.general.metastasis2 = s'C22.0') or (SERUMS.USTAN.general.metastasis3 = s'C22.0') ? 3 :
+   randomWeightedValue(SERUMS.USTAN.general.liver_flag,
+   1270 ? 0,
+   12 ? 1,
+   4 ? 3))
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- sets metastasis1 based on the tnm_m stage and randomWeightedValue-->
+<rule enabled="true" name="metastasis1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.metastasis1"/>
+<column id="SERUMS.USTAN.general.tnm_m"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.metastasis1 = (SERUMS.USTAN.general.tnm_m = 0 ? randomWeightedValue(SERUMS.USTAN.general.metastasis1,
+    4225 ? s'C00.0',
+    2 ? {s'C22.0', s'C34.9'}),
+  SERUMS.USTAN.general.tnm_m = 1 ? randomWeightedValue(SERUMS.USTAN.general.metastasis1,
+      77 ? {s'C22.0', s'C34.9', s'C41.2', s'C41.9'},
+      6 ? s'C00.0',
+      8 ? {s'C38.4', s'C41.3'},
+      8 ? {s'C16.9', s'C41.4', s'C48.1', s'C48.2', s'C54.1', s'C56.9', s'C71.6'})
+    : randomWeightedValue(SERUMS.USTAN.general.metastasis1,
+      316 ? s'C00.0',   94 ? {s'C41.2', s'C41.9'},
+      55 ? {s'C22.0', s'C34.9'},
+      10 ? s'C41.3',   18 ? {s'C38.4', s'C41.4', s'C71.9'},
+      13 ? {s'C40.0', s'C41.0', s'C44.5'},
+      10 ? {s'C16.9', s'C34.3', s'C42.1', s'C48.2', s'C49.6'},
+      6 ? {s'C44.2', s'C56.9', s'C69.4', s'C71.4', s'C71.7', s'C76.2'}))
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--if metastasis1 is null then metastasis2 must be null and metastasis3 must be null-->
+<rule enabled="true" name="null_metastasis" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.metastasis1"/>
+<column id="SERUMS.USTAN.general.metastasis2"/>
+<column id="SERUMS.USTAN.general.metastasis3"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>((SERUMS.USTAN.general.metastasis1 is NULL) -&gt; (SERUMS.USTAN.general.metastasis2 is NULL)) and ((SERUMS.USTAN.general.metastasis2 is NULL) -&gt; (SERUMS.USTAN.general.metastasis3 is NULL))</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--fills in the node number_positive based on tnm_n and randomWeightedValue-->
+<rule enabled="true" name="number_positive" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr06s.clinical_n"/>
+<column id="SERUMS.USTAN.smr06s.number_positive"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.smr06s.number_positive = (
+  SERUMS.USTAN.smr06s.clinical_n == s'0' ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.number_positive,
+      174 ? -1,
+      171 ? 0,
+      40 ? 1
+    ),
+  SERUMS.USTAN.smr06s.clinical_n == s'1' ?
+    randomWeightedNumber (
+      153 ? 1,
+      114 ? -1,
+      58 ? 0
+    ),
+  SERUMS.USTAN.smr06s.clinical_n == s'2' ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.number_positive,
+      27 ? -1,
+      19 ? 1
+    ),
+  SERUMS.USTAN.smr06s.clinical_n == s'3' ?
+    randomWeightedValue(SERUMS.USTAN.smr06s.number_positive,
+      33 ? 1,
+      21 ? -1
+    ):  randomWeightedValue(SERUMS.USTAN.smr06s.number_positive,
+      161 ? -1,
+      34 ? 1,
+      29? 0
+    )
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- pathological_tumour_size is either -1 or 2 to 140 then adjusted based on number_positive and randomWeightedValue -->
+<rule enabled="true" name="pathological_tumour_size" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr06s.number_positive"/>
+<column id="SERUMS.USTAN.smr06s.pathological_tumour_size"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>(SERUMS.USTAN.smr06s.pathological_tumour_size memberOf {-1.00, [2.00, 140.00]}) &amp;&amp; (
+	SERUMS.USTAN.smr06s.pathological_tumour_size = (
+	  SERUMS.USTAN.smr06s.number_positive == -1 ?
+	    randomWeightedNumber (
+	      473 ? -1.00,
+	      6 ? {[6.00,8.00]},
+	      9 ? {[26.00, 33.00]},
+	      3? 40.00
+	    ),
+	  SERUMS.USTAN.smr06s.number_positive == 0 ?
+	    randomWeightedNumber (
+	      204 ? normalDistributionNumber(22.93,186.04),
+	      9 ? -1.00
+	    ) :  randomWeightedNumber (
+	      151 ? -1.00,
+	      179 ? normalDistributionNumber(34.82, 324.514)
+	    )
+	)
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- pulmonary_flag is set to 1 if metastasis1 2 or 3 is C34.9, and randomWeightedValue (0,1) elsewhere -->
+<rule enabled="true" name="pulmonary_flag" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.metastasis1"/>
+<column id="SERUMS.USTAN.general.metastasis2"/>
+<column id="SERUMS.USTAN.general.metastasis3"/>
+<column id="SERUMS.USTAN.general.pulmonary_flag"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.pulmonary_flag = ((SERUMS.USTAN.general.metastasis1 = s'C34.9') or (SERUMS.USTAN.general.metastasis2 = s'C34.9') or (SERUMS.USTAN.general.metastasis3 = s'C34.9') ? 1 :
+  randomWeightedValue(SERUMS.USTAN.general.pulmonary_flag,   1200 ? 0,   120 ? 1))
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--stage_detail is a randomWeightedValue based on stage-->
+<rule enabled="true" name="stage_detail" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.stage"/>
+<column id="SERUMS.USTAN.general.stage_detail"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.stage_detail = (
+  SERUMS.USTAN.general.stage == 1 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.stage_detail,
+      1067 ? s'1',
+      581  ? s'1C',
+      217  ? s'1B',
+      47   ? s'1A'
+    ),
+  SERUMS.USTAN.general.stage == 2 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.stage_detail,
+      1097 ? s'2A',
+      572  ? s'2B',
+      20  ? s'2'
+    ),
+  SERUMS.USTAN.general.stage == 3 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.stage_detail,
+      190 ? s'3A',
+      177 ? s'3B',
+      10 ? s'3C',
+      8  ? s'3'
+  ),
+  SERUMS.USTAN.general.stage == 4 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.stage_detail,
+      220 ? s'4A',
+      1  ? s'4'
+    ) : intToString(SERUMS.USTAN.general.stage))</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- tnm_m is a randomWeightedValue based on stage-->
+<rule enabled="true" name="tnm_m" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.stage"/>
+<column id="SERUMS.USTAN.general.tnm_m"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.tnm_m = (
+  SERUMS.USTAN.general.stage == 0 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      304 ? 0,
+      2 ? -1
+    ),
+  SERUMS.USTAN.general.stage == 1 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      1870 ? 0,
+      41 ? -1,
+      1? 1
+    ),
+  SERUMS.USTAN.general.stage == 2 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      1678 ? 0,
+      11 ? -1
+    ),
+  SERUMS.USTAN.general.stage == 3 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      367 ? 0,
+      16? -1,
+      2? 1
+    ),
+  SERUMS.USTAN.general.stage == 4 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      125 ? -1,
+      95 ? 1,
+      1? 0
+    ) : randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      324 ? -1,
+      7 ? 0,
+      1 ? 1
+    )
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- tnm_m is a randomWeightedValue based on stage-->
+<rule enabled="true" name="tnm_m" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.stage"/>
+<column id="SERUMS.USTAN.general.tnm_m"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.tnm_m = (
+  SERUMS.USTAN.general.stage == 0 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      304 ? 0,
+      2 ? -1
+    ),
+  SERUMS.USTAN.general.stage == 1 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      1870 ? 0,
+      41 ? -1,
+      1? 1
+    ),
+  SERUMS.USTAN.general.stage == 2 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      1678 ? 0,
+      11 ? -1
+    ),
+  SERUMS.USTAN.general.stage == 3 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      367 ? 0,
+      16? -1,
+      2? 1
+    ),
+  SERUMS.USTAN.general.stage == 4 ?
+    randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      125 ? -1,
+      95 ? 1,
+      1? 0
+    ) : randomWeightedValue (
+      SERUMS.USTAN.general.tnm_m,
+      324 ? -1,
+      7 ? 0,
+      1 ? 1
+    )
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!-- tnm_n is based on stage and a randomWeightedValue-->
+<rule enabled="true" name="tnm_n" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.stage"/>
+<column id="SERUMS.USTAN.general.tnm_n"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.tnm_n = (
+ SERUMS.USTAN.general.stage == 0 ?
+    randomWeightedValue(SERUMS.USTAN.general.tnm_n,
+      304 ? 0,
+      2  ? -1
+    ),
+  SERUMS.USTAN.general.stage == 1 ?
+    randomWeightedValue(SERUMS.USTAN.general.tnm_n,
+      1872 ? 0,
+      38  ? -1,
+      2  ? 1
+    ),
+  SERUMS.USTAN.general.stage == 2 ?
+    randomWeightedValue(SERUMS.USTAN.general.tnm_n,
+      877 ? 0,
+      801  ? 1,
+      10  ? -1,
+      1 ? 2
+  ),
+  SERUMS.USTAN.general.stage == 3 ?
+    randomWeightedValue(SERUMS.USTAN.general.tnm_n,
+      185 ? 1,
+      96  ? 2,
+      61  ? 3,
+      29  ? 0,
+      14 ? -1
+  ),
+  SERUMS.USTAN.general.stage == 4 ?
+    randomWeightedValue(SERUMS.USTAN.general.tnm_n,
+      125 ? -1,
+      54  ? 1,
+      15  ? 0,
+      15  ? 3,
+      12  ? 2
+  ),
+  SERUMS.USTAN.general.stage == 9 ?
+    randomWeightedValue(SERUMS.USTAN.general.tnm_n,
+      324 ? -1,
+      8  ? {[1, 1]}
+  )
+    )</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+
+<!-- tnm_n_detail is a randomWeightedValue based on tnm_n -->
+<rule enabled="true" name="tnm_n_detail" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.tnm_n"/>
+<column id="SERUMS.USTAN.general.tnm_n_detail"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.tnm_n_detail = (
+  SERUMS.USTAN.general.tnm_n == 1 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_n_detail,
+      1042 ? s'1',
+      4 ? s'1A'
+    ),
+  SERUMS.USTAN.general.tnm_n == 2 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_n_detail,
+      107 ? s'2',
+      4? s'2A'
+    ): intToString(SERUMS.USTAN.general.tnm_n))</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- tnm_t is based on stage and randomWeightedValue-->
+<rule enabled="true" name="tnm_t" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.stage"/>
+<column id="SERUMS.USTAN.general.tnm_t"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.tnm_t = (
+ SERUMS.USTAN.general.stage == 0 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_t,
+      303 ? 1,
+      2  ? -1,
+      1  ? 0
+    ),
+  SERUMS.USTAN.general.stage == 1 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_t,
+      1866 ? 1,
+      37  ? -1,
+      7  ? 2,
+      2  ? 3
+    ),
+  SERUMS.USTAN.general.stage == 2 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_t,
+      1276 ? 2,
+      317  ? 1,
+      85  ? 3,
+      10  ? -1,
+      1 ? 0
+  ),
+  SERUMS.USTAN.general.stage == 3 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_t,
+      142 ? 3,
+      117  ? 4,
+      82  ? 2,
+      30  ? 1,
+      14 ? -1
+  ),
+  SERUMS.USTAN.general.stage == 4 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_t,
+      125 ? -1,
+      43  ? 4,
+      29  ? 2,
+      18  ? 3,
+      6  ? 1
+  ),
+    SERUMS.USTAN.general.stage == 4 ?
+    randomWeightedValue(
+    SERUMS.USTAN.general.tnm_t,
+      125 ? -1,
+      43  ? 4,
+      29  ? 2,
+      18  ? 3,
+      6  ? 1
+  ) : randomWeightedValue(
+    SERUMS.USTAN.general.tnm_t,
+      324 ? -1,
+      8 ? {[0, 2]}
+  ))</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- tnm_t_detail is based on tmn_t and a randomWeightedValue -->
+<rule enabled="true" name="tnm_t_detail" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.tnm_t"/>
+<column id="SERUMS.USTAN.general.tnm_t_detail"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.tnm_t_detail = (
+ SERUMS.USTAN.general.tnm_t == 1 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_t_detail,
+      1199 ? s'1C',
+      624  ? s'1',
+      342  ? s'1B',
+      303 ? s'1S',
+      56  ? s'1A'
+    ),
+  SERUMS.USTAN.general.tnm_t == 2 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_t_detail,
+      1392 ? s'2',
+      2  ? s'2A',
+      2  ? s'2B'
+    ),
+  SERUMS.USTAN.general.tnm_t == 3 ?
+    randomWeightedValue(
+      SERUMS.USTAN.general.tnm_t_detail,
+      248 ? s'3',
+      1  ? s'3A',
+      1  ? s'3B'
+  ),
+  SERUMS.USTAN.general.tnm_t == 4 ?
+    randomWeightedValue(
+    SERUMS.USTAN.general.tnm_t_detail,
+      68 ? s'4B',
+      46  ? s'4',
+      37  ? s'4D',
+      8 ? s'4C',
+      1  ? s'4A'
+    ) : intToString(SERUMS.USTAN.general.tnm_t)
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+</rules>

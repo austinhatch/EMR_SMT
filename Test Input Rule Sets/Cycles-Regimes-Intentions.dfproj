@@ -1,0 +1,908 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<rules>
+
+<!-- Cycle Ratio is the number of times a regime ID shows up in a cycle -->
+<rule enabled="true" name="CycleRatio" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.cycle_ratio"/>
+<column id="SERUMS.USTAN.cycles.regime_id"/>
+<column id="SERUMS.USTAN.regimes.regime_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>numOf(from(SERUMS.USTAN.cycles), SERUMS.USTAN.cycles.regime_id = SERUMS.USTAN.regimes.regime_id) = SERUMS.USTAN.regimes.cycle_ratio</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- The appointment_date for a cycle is the cycle's init_appointment_date + elapsed_days -->
+<rule enabled="true" name="appointment_date_3" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.cycles.appointment_date"/>
+<column id="SERUMS.USTAN.cycles.elapsed_days"/>
+<column id="SERUMS.USTAN.cycles.init_appointment_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.cycles.appointment_date = SERUMS.USTAN.cycles.init_appointment_date + SERUMS.USTAN.cycles.elapsed_days</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- ??? links regimes to intentions via intention_id -->
+<rule enabled="true" name="ForEachIntention" type="Constraint Rule">
+<description/>
+<columns>
+<sources>
+<column id="src2.USTAN.intentions.intention_id"/>
+</sources>
+<targets>
+<column id="SERUMS.USTAN.regimes.intention_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>reuseData(SERUMS.USTAN.regimes.intention_id = src2.USTAN.intentions.intention_id, SEQUENTIAL)</constraint>
+<properties>
+<enum name="Strategy" value="SEQUENTIAL">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- ??? Links patients to intentions via patient_id -->
+<rule enabled="false" name="ForEachPatient1" type="Constraint Rule">
+<description/>
+<columns>
+<sources>
+<column id="src2.USTAN.patients.chi"/>
+<column id="src2.USTAN.patients.patient_id"/>
+</sources>
+<targets>
+<column id="SERUMS.USTAN.intentions.chi"/>
+<column id="SERUMS.USTAN.intentions.patient_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>reuseData((SERUMS.USTAN.intentions.patient_id = src2.USTAN.patients.patient_id) and (SERUMS.USTAN.intentions.chi = src2.USTAN.patients.chi), RANDOM)</constraint>
+<properties>
+<enum name="Strategy" value="RANDOM">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- ensures the first_intention in intentions = the first_intention of the patient -->
+<rule enabled="true" name="first_intention_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.first_intention"/>
+<column id="SERUMS.USTAN.patients.first_intention"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.first_intention = SERUMS.USTAN.patients.first_intention</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--links cycles to regimes via regime_id, regime, intention_id, interval_days, appointment_date-->
+<rule enabled="true" name="ForEachRegime" type="Constraint Rule">
+<description/>
+<columns>
+<sources>
+<column id="src2.USTAN.regimes.appointment_date"/>
+<column id="src2.USTAN.regimes.intention_id"/>
+<column id="src2.USTAN.regimes.interval_days"/>
+<column id="src2.USTAN.regimes.regime"/>
+<column id="src2.USTAN.regimes.regime_id"/>
+</sources>
+<targets>
+<column id="SERUMS.USTAN.cycles.init_appointment_date"/>
+<column id="SERUMS.USTAN.cycles.intention_id"/>
+<column id="SERUMS.USTAN.cycles.interval_days"/>
+<column id="SERUMS.USTAN.cycles.regime"/>
+<column id="SERUMS.USTAN.cycles.regime_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>reuseData((SERUMS.USTAN.cycles.regime_id = src2.USTAN.regimes.regime_id) and (SERUMS.USTAN.cycles.regime = src2.USTAN.regimes.regime) and (SERUMS.USTAN.cycles.intention_id = src2.USTAN.regimes.intention_id) and (SERUMS.USTAN.cycles.interval_days = src2.USTAN.regimes.interval_days) and (SERUMS.USTAN.cycles.init_appointment_date = src2.USTAN.regimes.appointment_date), SEQUENTIAL)</constraint>
+<properties>
+<enum name="Strategy" value="SEQUENTIAL">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- links regimes to intentions via chi, first_regime, appointment_date, intention, cycle_ratio -->
+<rule enabled="true" name="FromIntention" type="Constraint Rule">
+<description/>
+<columns>
+<sources>
+<column id="src2.USTAN.intentions.appointment_date"/>
+<column id="src2.USTAN.intentions.chi"/>
+<column id="src2.USTAN.intentions.cycle_ratio"/>
+<column id="src2.USTAN.intentions.first_regime"/>
+<column id="src2.USTAN.intentions.intention"/>
+</sources>
+<targets>
+<column id="SERUMS.USTAN.regimes.chi"/>
+<column id="SERUMS.USTAN.regimes.cycle_ratio"/>
+<column id="SERUMS.USTAN.regimes.first_regime"/>
+<column id="SERUMS.USTAN.regimes.init_appointment_date"/>
+<column id="SERUMS.USTAN.regimes.intention"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>reuseData((SERUMS.USTAN.regimes.chi = src2.USTAN.intentions.chi) and (SERUMS.USTAN.regimes.first_regime = src2.USTAN.intentions.first_regime) and (SERUMS.USTAN.regimes.init_appointment_date = src2.USTAN.intentions.appointment_date) and (SERUMS.USTAN.regimes.intention = src2.USTAN.intentions.intention) and (SERUMS.USTAN.regimes.cycle_ratio = src2.USTAN.intentions.cycle_ratio), RANDOM)</constraint>
+<properties>
+<enum name="Strategy" value="RANDOM">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- links cycles to regimes via intention and CHI -->
+<rule enabled="true" name="FromRegimes" type="Constraint Rule">
+<description/>
+<columns>
+<sources>
+<column id="src2.USTAN.regimes.chi"/>
+<column id="src2.USTAN.regimes.intention"/>
+</sources>
+<targets>
+<column id="SERUMS.USTAN.cycles.chi"/>
+<column id="SERUMS.USTAN.cycles.intention"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>reuseData((SERUMS.USTAN.cycles.intention = src2.USTAN.regimes.intention) and (SERUMS.USTAN.cycles.chi = src2.USTAN.regimes.chi), RANDOM)</constraint>
+<properties>
+<enum name="Strategy" value="RANDOM">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- Ensures that the prev_regime for a given regime is the previous regime in the regime table based on intention_id -->
+<rule enabled="true" name="PREV_REGIME" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.intention_id"/>
+<column id="SERUMS.USTAN.regimes.intention_id"/>
+<column id="SERUMS.USTAN.regimes.prev_regime"/>
+<column id="SERUMS.USTAN.regimes.regime"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.regimes.prev_regime = lastTableValue(from(SERUMS.USTAN.regimes), SERUMS.USTAN.regimes.intention_id = SERUMS.USTAN.intentions.intention_id, SERUMS.USTAN.regimes.regime, s'')</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- Ensure that the cycle_ratio for a regime is the number of cycles with that regime_id -->
+<rule enabled="true" name="Ratio" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.cycle_ratio"/>
+<column id="SERUMS.USTAN.regimes.regime_id"/>
+<column id="SERUMS.USTAN.cycles.regime_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>numOf(from(SERUMS.USTAN.cycles), SERUMS.USTAN.cycles.regime_id = SERUMS.USTAN.regimes.regime_id) = SERUMS.USTAN.regimes.cycle_ratio</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--The regime_ratio of an intention is the number of regimes with the intention_id -->
+<rule enabled="true" name="RatioRegimes" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.intention_id"/>
+<column id="SERUMS.USTAN.intentions.intention_id"/>
+<column id="SERUMS.USTAN.intentions.regime_ratio"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>numOf(from(SERUMS.USTAN.regimes), SERUMS.USTAN.regimes.intention_id = SERUMS.USTAN.intentions.intention_id) = SERUMS.USTAN.intentions.regime_ratio</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- Every cycle must have a regime_id -->
+<rule enabled="true" name="cycle" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.cycles.cycle"/>
+<column id="SERUMS.USTAN.cycles.regime_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>monotonic(from(SERUMS.USTAN.cycles), per(SERUMS.USTAN.cycles.regime_id), SERUMS.USTAN.cycles.cycle, 1, 1)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- A regime's cycle_ratio will equal the intentions cycle_ratio -->
+<rule enabled="true" name="cycle_ratio_2" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.cycle_ratio"/>
+<column id="SERUMS.USTAN.intentions.cycle_ratio"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.regimes.cycle_ratio = SERUMS.USTAN.intentions.cycle_ratio</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--The elapsed_days for an intention is a monotonic distribution per patient_id -->
+<rule enabled="true" name="elapsed_days" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.elapsed_days"/>
+<column id="SERUMS.USTAN.intentions.patient_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>monotonic(from(SERUMS.USTAN.intentions), per(SERUMS.USTAN.intentions.patient_id), SERUMS.USTAN.intentions.elapsed_days, 2000, 0)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+
+
+<!-- -->
+<rule enabled="true" name="elapsed_days_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.elapsed_days"/>
+<column id="SERUMS.USTAN.regimes.intention_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>monotonic(from(SERUMS.USTAN.regimes), per(SERUMS.USTAN.regimes.intention_id), SERUMS.USTAN.regimes.elapsed_days, 210, 0)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!-- -->
+<rule enabled="true" name="elapsed_ratio" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.cycles.elapsed_days"/>
+<column id="SERUMS.USTAN.cycles.regime_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>monotonic(from(SERUMS.USTAN.cycles), per(SERUMS.USTAN.cycles.regime_id), SERUMS.USTAN.cycles.elapsed_days, 21, 0)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- ensures the first_regime in intentions = the first_regime of the regime -->
+<rule enabled="true" name="first_regime_2" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.first_regime"/>
+<column id="SERUMS.USTAN.intentions.first_regime"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.regimes.first_regime = SERUMS.USTAN.intentions.first_regime</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- the regimes intention equals the intentions intention -->
+<rule enabled="true" name="intention_2" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.intention"/>
+<column id="SERUMS.USTAN.intentions.intention"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.regimes.intention = SERUMS.USTAN.intentions.intention</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+
+<!-- the cycles intention = the regimes intention -->
+<rule enabled="true" name="intention_3" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.cycles.intention"/>
+<column id="SERUMS.USTAN.regimes.intention"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.cycles.intention = SERUMS.USTAN.regimes.intention</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--the intention_id for a cycle = the intention_id for the regime -->
+<rule enabled="true" name="intention_id_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.cycles.intention_id"/>
+<column id="SERUMS.USTAN.regimes.intention_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.cycles.intention_id = SERUMS.USTAN.regimes.intention_id</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- the regime_ratio for an intention is the number of regimes with that intention_id -->
+<rule enabled="true" name="intention_id_RATIO" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.intention_id"/>
+<column id="SERUMS.USTAN.intentions.intention_id"/>
+<column id="SERUMS.USTAN.intentions.regime_ratio"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>numOf(from(SERUMS.USTAN.regimes), SERUMS.USTAN.regimes.intention_id = SERUMS.USTAN.intentions.intention_id) = SERUMS.USTAN.intentions.regime_ratio</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- -->
+<rule enabled="true" name="intention_seq" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.intention_seq"/>
+<column id="SERUMS.USTAN.intentions.patient_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>monotonic(from(SERUMS.USTAN.intentions), per(SERUMS.USTAN.intentions.patient_id), SERUMS.USTAN.intentions.intention_seq, 1, 1)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- -->
+<rule enabled="true" name="intention_seq_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.intention_seq"/>
+<column id="SERUMS.USTAN.intentions.patient_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>monotonic(from(SERUMS.USTAN.intentions), per(SERUMS.USTAN.intentions.patient_id), SERUMS.USTAN.intentions.intention_seq, 1, 1)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- the interval_days for a regime is between 15 and 21 (2 or 3 weeks?) -->
+<rule enabled="true" name="interval_days" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.interval_days"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>15 &lt;= SERUMS.USTAN.regimes.interval_days &lt;= 21</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+
+<!-- the interval_days for a regime = the interval_days for a cycle-->
+<rule enabled="true" name="interval_days_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.cycles.interval_days"/>
+<column id="SERUMS.USTAN.regimes.interval_days"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.cycles.interval_days = SERUMS.USTAN.regimes.interval_days</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- the prev_regime for a regime is the first previous regime with the same intention_id in the regime table -->
+<rule enabled="true" name="prev_regime" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.intention_id"/>
+<column id="SERUMS.USTAN.regimes.intention_id"/>
+<column id="SERUMS.USTAN.regimes.prev_regime"/>
+<column id="SERUMS.USTAN.regimes.regime"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.regimes.prev_regime =
+  lastTableValue(
+  from(SERUMS.USTAN.regimes),
+  SERUMS.USTAN.regimes.intention_id =
+  SERUMS.USTAN.intentions.intention_id,
+  SERUMS.USTAN.regimes.regime,
+  s''
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- A regime is determined based on the prev_regime and whether or not it is a first_regime -->
+<rule enabled="true" name="regime" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.first_regime"/>
+<column id="SERUMS.USTAN.regimes.prev_regime"/>
+<column id="SERUMS.USTAN.regimes.regime"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.regimes.regime = (SERUMS.USTAN.regimes.prev_regime = s'FEC-D' ? randomWeightedNumber(
+    150 ? s'FEC-D',
+    30 ? s'FEC80'),
+  SERUMS.USTAN.regimes.prev_regime = s'FEC80' ? randomWeightedNumber(
+    150 ? s'FEC80',
+    30 ? s'FEC-D'),
+  SERUMS.USTAN.regimes.prev_regime = s'DOCETAXEL' ? randomWeightedNumber(
+    150 ? s'DOCETAXEL',
+    30 ? s'PACLITAX'),
+  SERUMS.USTAN.regimes.prev_regime = s'' ? SERUMS.USTAN.regimes.first_regime
+  : randomWeightedNumber(
+    150 ? s'PACLITAX',
+    30 ? s'DOCETAXEL'))
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--the cycles.regime = the regimes.regime-->
+<rule enabled="true" name="regime_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.cycles.regime"/>
+<column id="SERUMS.USTAN.regimes.regime"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.cycles.regime = SERUMS.USTAN.regimes.regime</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+]<!--regime_ratio is a random number based on intention (Adjuvant) or 5 -->
+<rule enabled="true" name="regime_ratio_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.intention"/>
+<column id="SERUMS.USTAN.intentions.regime_ratio"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.regime_ratio = (SERUMS.USTAN.intentions.intention = s'Adjuvant' ? randomNumber(2, 8) : 5)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+
+<!--the regime regime_ratio = the intentions regime_ratio-->
+<rule enabled="true" name="regime_ratio_2" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.regime_ratio"/>
+<column id="SERUMS.USTAN.intentions.regime_ratio"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.regimes.regime_ratio = SERUMS.USTAN.intentions.regime_ratio</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--the regime_ratio for an intention is based on the intention and randomWeightedValue -->
+<rule enabled="true" name="regime_ratio_value" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.intention"/>
+<column id="SERUMS.USTAN.intentions.regime_ratio"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.regime_ratio =
+  (SERUMS.USTAN.intentions.intention = s'Adjuvant' ? randomWeightedNumber(
+    274 ? 1,
+    164 ? 2,
+    14 ? 3,
+    1 ? 4),
+  SERUMS.USTAN.intentions.intention = s'Neo-Adjuvant' ? randomWeightedNumber(
+    51 ? 1,
+    166 ? 2,
+    19 ? 3,
+    2 ? 4),
+  SERUMS.USTAN.intentions.intention = s'Palliative' ? randomWeightedNumber(
+    144 ? 1,
+    67 ? 2,
+    23 ? 3,
+    26 ? randomNumber(4, 5),   16 ? randomNumber(6, 8),   1 ? 10)
+    : 7)
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- -->
+<rule enabled="true" name="regime_seq" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.intention_id"/>
+<column id="SERUMS.USTAN.regimes.regime_seq"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>monotonic(from(SERUMS.USTAN.regimes), per(SERUMS.USTAN.regimes.intention_id), SERUMS.USTAN.regimes.regime_seq, {1}, 1)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+
+<!-- -->
+<rule enabled="true" name="regime_seq_monotonic" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.intention"/>
+<column id="SERUMS.USTAN.regimes.regime_seq"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>monotonic(from(SERUMS.USTAN.regimes), per(SERUMS.USTAN.regimes.intention), SERUMS.USTAN.regimes.regime_seq, 1, 1)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--the first regime for an intention is based on whether the intention is Adjuvant and a randomWeightedValue-->
+<rule enabled="true" name="rrrrrrrrrr" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.first_regime"/>
+<column id="SERUMS.USTAN.intentions.intention"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.first_regime = (SERUMS.USTAN.intentions.intention = s'Adjuvant' ? randomWeightedValue(SERUMS.USTAN.intentions.first_regime,
+    77 ? s'FEC-D',
+    88 ? s'FEC80') :
+  randomWeightedValue(SERUMS.USTAN.intentions.first_regime,
+    77 ? s'DOCETAXEL',
+    777 ? s'PACLITAX'))
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+</rules>

@@ -1,0 +1,915 @@
+<rules>
+
+
+
+<!--The admission_date for an smr01 visit is the incidence_date + the elapsed_days-->
+<rule enabled="true" name="admission_date" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr01s.admission_date"/>
+<column id="SERUMS.USTAN.smr01s.elapsed_days"/>
+<column id="SERUMS.USTAN.smr01s.incidence_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.smr01s.admission_date = (SERUMS.USTAN.smr01s.incidence_date + SERUMS.USTAN.smr01s.elapsed_days)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- if death flag = 1, the date of death is the first date they were seen + survival days -->
+<rule enabled="true" name="Date_death" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.dat_death"/>
+<column id="SERUMS.USTAN.general.death_flag"/>
+<column id="SERUMS.USTAN.general.first_seen_date"/>
+<column id="SERUMS.USTAN.general.survival_days"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>(SERUMS.USTAN.general.death_flag == 1) -&gt; (SERUMS.USTAN.general.dat_death = SERUMS.USTAN.general.first_seen_date + SERUMS.USTAN.general.survival_days)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- if death_flag is not 1, there is no dat_death -->
+<rule enabled="true" name="date_death_null" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.dat_death"/>
+<column id="SERUMS.USTAN.general.death_flag"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>(SERUMS.USTAN.general.death_flag != 1) -&gt; (SERUMS.USTAN.general.dat_death is NULL)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- The age_at_diagnosis is greater than 0 and less than or equal to the patients age -->
+<rule enabled="true" name="age_at_diagnosis" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.age"/>
+<column id="SERUMS.USTAN.general.age_at_diagnosis"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>0 &lt;= SERUMS.USTAN.general.age_at_diagnosis &lt;= SERUMS.USTAN.general.age</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- The appointment_date for an intention is the init_appointment_date + elapsed_days -->
+<rule enabled="true" name="appointment_date" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.appointment_date"/>
+<column id="SERUMS.USTAN.intentions.elapsed_days"/>
+<column id="SERUMS.USTAN.intentions.init_appointment_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.appointment_date = SERUMS.USTAN.intentions.init_appointment_date + SERUMS.USTAN.intentions.elapsed_days</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- A patient's appointment_date should be after 2/18/2018 and less than today -->
+<rule enabled="true" name="appointment_date_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.patients.appointment_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>02/18/2018 &lt;= SERUMS.USTAN.patients.appointment_date &lt;= currentDate</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- *New* Generate a Menopausal Value of 1/0 given age
+<rule enabled="true" name="appointment_date_3" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.age"/>
+<column id="SERUMS.USTAN.general.menopause"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.menopause = (SERUMS.USTAN.general.age < 40 ? randomWeightedNumber(
+    1 ? 1,
+    99 ? 0),
+  40 <= SERUMS.USTAN.general.age < 65 ? randomWeightedNumber(
+   85 ? 1,
+   15 ? 0),
+  SERUMS.USTAN.general.age >= 65 ? randomWeightedNumber(
+   998 ? 1,
+   2 ? 0))
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--*NEW if gender is 1, menopause is 0-->
+<rule enabled="true" name="survival_days" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.gender"/>
+<column id="SERUMS.USTAN.general.menopause"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>(SERUMS.USTAN.general.gender == 1) -&gt; (SERUMS.USTAN.general.menopause == 0)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- The appointment_date for a cycle is the cycle's init_appointment_date + elapsed_days -->
+<rule enabled="true" name="appointment_date_3" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.cycles.appointment_date"/>
+<column id="SERUMS.USTAN.cycles.elapsed_days"/>
+<column id="SERUMS.USTAN.cycles.init_appointment_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.cycles.appointment_date = SERUMS.USTAN.cycles.init_appointment_date + SERUMS.USTAN.cycles.elapsed_days</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--BMI is based on a random weighted value of normal distributions -->
+<rule enabled="true" name="bmi" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.bmi"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.bmi = randomWeightedValue(SERUMS.USTAN.general.bmi,
+ 638 ? normalDistributionNumber(24.7, 1.69),
+ 182 ? normalDistributionNumber(32.2, 1.18),
+ 80  ? normalDistributionNumber(36.7, 1.1),
+ 19  ? normalDistributionNumber(16.74, 1.21)
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+
+
+<!--The charlson_score for a patient is the sum of all of the comorbidity flags-->
+<rule enabled="true" name="charlson_score" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.aids_hiv_flag"/>
+<column id="SERUMS.USTAN.general.cancer_flag"/>
+<column id="SERUMS.USTAN.general.charlson_score"/>
+<column id="SERUMS.USTAN.general.con_tiss_disease_rheum_flag"/>
+<column id="SERUMS.USTAN.general.cong_heart_fail_flag"/>
+<column id="SERUMS.USTAN.general.dementia_flag"/>
+<column id="SERUMS.USTAN.general.diabetes_flag"/>
+<column id="SERUMS.USTAN.general.liver_flag"/>
+<column id="SERUMS.USTAN.general.para_hemiplegia_flag"/>
+<column id="SERUMS.USTAN.general.pulmonary_flag"/>
+<column id="SERUMS.USTAN.general.renal_flag"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.charlson_score =
+SERUMS.USTAN.general.cong_heart_fail_flag +
+SERUMS.USTAN.general.dementia_flag +
+SERUMS.USTAN.general.pulmonary_flag +
+SERUMS.USTAN.general.con_tiss_disease_rheum_flag +
+SERUMS.USTAN.general.diabetes_flag +
+SERUMS.USTAN.general.para_hemiplegia_flag +
+SERUMS.USTAN.general.renal_flag +
+SERUMS.USTAN.general.liver_flag +
+SERUMS.USTAN.general.aids_hiv_flag +
+SERUMS.USTAN.general.cancer_flag</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--con_tiss_flag = con_tiss_disease_rheum_flag-->
+<rule enabled="true" name="con_tiss" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.con_tiss_disease_rheum_flag"/>
+<column id="SERUMS.USTAN.general.con_tiss_flag"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.con_tiss_flag = SERUMS.USTAN.general.con_tiss_disease_rheum_flag</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- main_operation_a and main_operation_b must be different -->
+<rule enabled="true" name="diff_operation" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr01s.main_operation_a"/>
+<column id="SERUMS.USTAN.smr01s.main_operation_b"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>allDiff(i, items({main_operation_a, main_operation_b}), SERUMS.USTAN.smr01s.i)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- discharge_date is the sum of the admission_date and length_of_stay - 1 -->
+<rule enabled="true" name="discharge_date" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr01s.admission_date"/>
+<column id="SERUMS.USTAN.smr01s.discharge_date"/>
+<column id="SERUMS.USTAN.smr01s.length_of_stay"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.smr01s.discharge_date = (SERUMS.USTAN.smr01s.admission_date + SERUMS.USTAN.smr01s.length_of_stay) - 1</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- date_of_birth = dob -->
+<rule enabled="true" name="dateOfBirth" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.date_of_birth"/>
+<column id="SERUMS.USTAN.general.dob"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.date_of_birth = SERUMS.USTAN.general.dob</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- Patient's date of birth must be greater than the incidence_date - the days they've been alive and less than the incidence_date - the days they've been alive + 30 -->
+<rule enabled="true" name="date_of_birth" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.age"/>
+<column id="SERUMS.USTAN.general.dob"/>
+<column id="SERUMS.USTAN.general.incidence_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.incidence_date - (SERUMS.USTAN.general.age * 365) &lt;= SERUMS.USTAN.general.dob &lt;= SERUMS.USTAN.general.incidence_date - (SERUMS.USTAN.general.age * 365) + 30</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!-- -->
+<rule enabled="true" name="elapsed_days_2" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr01s.chi"/>
+<column id="SERUMS.USTAN.smr01s.elapsed_days"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>monotonic(from(SERUMS.USTAN.smr01s),
+  per(SERUMS.USTAN.smr01s.chi), SERUMS.USTAN.smr01s.elapsed_days,
+ {fixedpointToInt(normalDistributionNumber(110.4, 17.2))}, randomNumber(14,39)
+)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!-- constraint on incidence_date as 5 years to 250 days prior -->
+<rule enabled="true" name="incidence_date" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.incidence_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>currentDate - (5*365) &lt; SERUMS.USTAN.general.incidence_date &lt;= currentDate - 250</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--the incidence_date in smr01s should equal incidence_date in general-->
+<rule enabled="true" name="incidence_date_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr01s.incidence_date"/>
+<column id="SERUMS.USTAN.general.incidence_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.smr01s.incidence_date = SERUMS.USTAN.general.incidence_date</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+## sets constraint for incidence_date in smr06s
+<rule enabled="true" name="incidence_date_2" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr06s.incidence_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>currentDate - 2339 &lt; SERUMS.USTAN.smr06s.incidence_date &lt;= currentDate - 261</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- the init_appointment_date of intentions is the appointment_date for a patient -->
+<rule enabled="true" name="init_appointment_date" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.patients.appointment_date"/>
+<column id="SERUMS.USTAN.intentions.init_appointment_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.init_appointment_date = SERUMS.USTAN.patients.appointment_date</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- the init_appointment_date of intentions is the appointment_date for a patient -->
+<rule enabled="true" name="init_appointment_date_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.patients.appointment_date"/>
+<column id="SERUMS.USTAN.intentions.init_appointment_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.init_appointment_date = SERUMS.USTAN.patients.appointment_date</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- the regimes appointment_date is the regimes init_appointment_date + elapsed_days -->
+<rule enabled="true" name="init_appointment_date_2" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.appointment_date"/>
+<column id="SERUMS.USTAN.regimes.elapsed_days"/>
+<column id="SERUMS.USTAN.regimes.init_appointment_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.regimes.appointment_date = SERUMS.USTAN.regimes.init_appointment_date + SERUMS.USTAN.regimes.elapsed_days</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--the init_appointment_date of regime is the appointment_date for the intention-->
+<rule enabled="true" name="init_appointment_date_3" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.appointment_date"/>
+<column id="SERUMS.USTAN.regimes.init_appointment_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.regimes.init_appointment_date = SERUMS.USTAN.intentions.appointment_date</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- the init_appointment_date of cycles is the appointment_date for a regime -->
+<rule enabled="true" name="init_appointment_date_4" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.regimes.appointment_date"/>
+<column id="SERUMS.USTAN.cycles.init_appointment_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.cycles.init_appointment_date = SERUMS.USTAN.regimes.appointment_date</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!-- sets intention based on first_intention and whether it is the first_intention -->
+<rule enabled="true" name="intention" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.first_intention"/>
+<column id="SERUMS.USTAN.intentions.intention"/>
+<column id="SERUMS.USTAN.intentions.intention_seq"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.intention = (SERUMS.USTAN.intentions.intention_seq = 1 ? SERUMS.USTAN.intentions.first_intention :
+  (SERUMS.USTAN.intentions.first_intention = s'Adjuvant' ? randomWeightedNumber(
+    194 ? s'Adjuvant',
+    9 ? s'Palliative')
+  : (SERUMS.USTAN.intentions.first_intention = s'Palliative' ? randomWeightedNumber(
+    302 ? s'Palliative',
+    2 ? s'Adjuvant')
+  : randomWeightedNumber(
+    210 ? s'Neo-Adjuvant',
+    12 ? s'Palliative',
+    3 ? s'Adjuvant'))))
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!-- the intentions first_intention is based on the intention -->
+<rule enabled="true" name="intention_1" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.first_intention"/>
+<column id="SERUMS.USTAN.intentions.intention"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.first_intention = (SERUMS.USTAN.intentions.intention = s'Adjuvant' ? randomWeightedValue(SERUMS.USTAN.intentions.intention,
+  150 ? s'Adjuvant',
+  30 ? s'Palliative')
+  : randomWeightedValue(SERUMS.USTAN.intentions.intention,   '
+  150 ? s'Palliative',
+  30 ? s'Adjuvant'))
+</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!--all of the other_condition will be different -->
+<rule enabled="true" name="null_ot_condition_all" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr01s.other_condition1"/>
+<column id="SERUMS.USTAN.smr01s.other_condition2"/>
+<column id="SERUMS.USTAN.smr01s.other_condition3"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>allDiff(i, items({other_condition1, other_condition2, other_condition3}), SERUMS.USTAN.smr01s.i)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--if other_condition1 is null then other_condition2 will be null and other_condition3 will be null-->
+<rule enabled="true" name="null_ot_conditions" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.smr01s.other_condition1"/>
+<column id="SERUMS.USTAN.smr01s.other_condition2"/>
+<column id="SERUMS.USTAN.smr01s.other_condition3"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>(SERUMS.USTAN.smr01s.other_condition1 is NULL -&gt; SERUMS.USTAN.smr01s.other_condition2 is NULL) &amp;&amp;
+(SERUMS.USTAN.smr01s.other_condition2 is NULL -&gt; SERUMS.USTAN.smr01s.other_condition3 is NULL)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!-- patient_id for a patient = patient_id of intention -->
+<rule enabled="true" name="patient_id" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.intentions.patient_id"/>
+<column id="SERUMS.USTAN.patients.patient_id"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.intentions.patient_id = SERUMS.USTAN.patients.patient_id</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--postcode is the concat of postcode_pre and postcode_suf-->
+<rule enabled="true" name="postcode" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.postcode"/>
+<column id="SERUMS.USTAN.general.postcode_pre"/>
+<column id="SERUMS.USTAN.general.postcode_suf"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.postcode = concat(SERUMS.USTAN.general.postcode_pre, SERUMS.USTAN.general.postcode_suf)</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--first_seen_date is the incidence_date -->
+<rule enabled="true" name="sameDateFirstSeen" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.first_seen_date"/>
+<column id="SERUMS.USTAN.general.incidence_date"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.first_seen_date = SERUMS.USTAN.general.incidence_date</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+<!--site is site_icd_10-->
+<rule enabled="true" name="site" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.site"/>
+<column id="SERUMS.USTAN.general.site_icd_10"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.site = SERUMS.USTAN.general.site_icd_10</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--if death_flag is 1, survival_days is between 0 and 1265 and is based on a normalDistributionNumber-->
+<rule enabled="true" name="survival_days" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.death_flag"/>
+<column id="SERUMS.USTAN.general.survival_days"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>(SERUMS.USTAN.general.death_flag == 1) -&gt; ((0 &lt;= SERUMS.USTAN.general.survival_days &lt;= 1265) &amp;&amp; SERUMS.USTAN.general.survival_days = normalDistributionValue(SERUMS.USTAN.general.survival_days, 0 ,511))</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+<!--weight is BMI * height ^2-->
+<rule enabled="true" name="weight" type="Constraint Rule">
+<description/>
+<columns>
+<sources/>
+<targets>
+<column id="SERUMS.USTAN.general.bmi"/>
+<column id="SERUMS.USTAN.general.height"/>
+<column id="SERUMS.USTAN.general.weight"/>
+</targets>
+</columns>
+<parameters/>
+<errorDescription/>
+<constraint>SERUMS.USTAN.general.weight = SERUMS.USTAN.general.bmi * SERUMS.USTAN.general.height^2</constraint>
+<properties>
+<enum name="Strategy" value="NONE">
+<values>
+<value>NONE</value>
+<value>RANDOM</value>
+<value>SEQUENTIAL</value>
+</values>
+</enum>
+</properties>
+</rule>
+
+
+</rules>
