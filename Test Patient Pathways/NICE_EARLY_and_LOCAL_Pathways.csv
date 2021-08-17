@@ -1,0 +1,23 @@
+﻿Page,Type,HER2,ER,HR,Node,Tstage,Nstage,Mstage,Menopause,NeoAdjChemo,NeoAdjEndo,NeoAdjAntiHER,NeoAdjRegime,NeoAdjPert,NeoAdjTrast,SLNB,Operation 1,Operation 2,Operation 3,DateBreastConstruction,AdjRadiation,AdjTrast,AdjPert,AdjNeratanib,CongenHeartHistory,AdjTrastIntervalDays,AdjTrastIntervalCycles,Comorbidities,AdjChemoRegime,AdjChemoDrug,Gender,AdjEndo,AdjEndoRegime
+Neoadjuvant Therapy,Early | LABC,-,0,-,-,-,-,-,-,1,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+Neoadjuvant Therapy,Early | LABC,-,1,-,-,-,-,-,1,0,1,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+Neoadjuvant Therapy,Early | LABC,-,1,-,-,-,-,-,0,1,1,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+Neoadjuvant Therapy,Early | LABC,1,-,-,-,-,-,-,-,1,-,1,-,1,1,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+Neoadjuvant Therapy,Early | LABC,-,1,-,-,-,-,-,-,1,-,-,Anthracycline + Platinum,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+Surgery to the Breast,LABC | DCIS,-,-,-,-,-,-,-,-,1,-,-,-,-,-,-,Masectomy,Breast Reconstruction | None,-,>= DateMasectomy,1,-,-,-,-,-,-,-,-,-,-,-,-
+Surgery to the Breast,LABC | DCIS,-,-,-,-,-,-,-,-,1,-,-,-,-,-,-,BCS,Masectomy | Breast Reconstruction |None ,Breast Reconstruction |None ,>= DateMasectomy,1,-,-,-,-,-,-,-,-,-,-,-,-
+Surgery to the Axilla,DCIS,-,-,-,0,-,-,-,-,-,-,-,-,-,-,1,Masectomy,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+Surgery to the Axilla,DCIS,-,-,-,-,-,-,-,-,-,-,-,-,-,-,1,-,Masectomy,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+Surgery to the Axilla,DCIS,-,-,-,-,-,-,-,-,-,-,-,-,-,-,0,BCS,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+Adjuvant Therapy,Early | LABC,1,-,-,-,>= 1c,-,-,-,1,-,-,Taxane,-,-,-,-,-,-,-,1,1,-,-,0,21,> 15 & < 18,-,-,-,-,-,-
+Adjuvant Therapy,Early | LABC,1,-,-,1,-,-,-,-,1,-,-,Taxane,-,-,-,-,-,-,-,1,1,1,-,0,21,> 15 & < 18,-,-,-,-,-,-
+Adjuvant Therapy,Early | LABC,1,-,1,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,1,-,1,-,-,-,-,-,-,-,-,-
+Adjuvant Therapy,Invasive,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,1,Anthracycline & Taxane,Paclitaxel,-,-,-
+Adjuvant Therapy,Invasive,-,1,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,1,1,Tamoxifen
+Adjuvant Therapy,Invasive,-,1,-,-,-,-,-,0,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,2,1,Tamoxifen
+Adjuvant Therapy,Invasive,-,1,-,-,-,-,-,1,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,2,1,AI
+Adjuvant Therapy,DCIS,-,1,-,-,-,-,-,-,-,-,-,-,-,-,-,BCS,-,-,-,0,-,-,-,-,-,-,-,-,-,-,1,-
+Adjuvant Therapy,-,-,-,-,1,-,-,-,-,-,-,-,-,-,-,-,Masectomy,-,-,-,1,-,-,-,-,-,-,-,-,-,-,-,-
+Adjuvant Therapy,-,-,-,-,1,-,-,-,-,-,-,-,-,-,-,-,-,Masectomy,-,-,1,-,-,-,-,-,-,-,-,-,-,-,-
+Adjuvant Therapy,-,-,-,-,0,3|4,-,-,-,-,-,-,-,-,-,-,Masectomy,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-
+Adjuvant Therapy,-,-,-,-,0,3|4,-,-,-,-,-,-,-,-,-,-,-,Masectomy,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-

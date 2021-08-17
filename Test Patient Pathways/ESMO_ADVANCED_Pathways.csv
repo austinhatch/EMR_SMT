@@ -1,0 +1,18 @@
+﻿Stage,HR,HER,ER,PD-L1,BRCA,Inflammatory,NeoAdjChemo,NeoAdjEndo,NeoAdjAntiHER,Operable,Operation,AdjuvantRT,Regime,Previous Regime
+LABC,1,0,,,,0,1,0,,,,,,
+LABC,1,0,,,,0,0,1,,,,,,
+LABC,1,0,,,,1,1,0,,,,,,
+LABC,0,0,0,,,,1,,,,,,,
+LABC,,1,,,,,1,,1,,,,,
+LABC,,,,,,1,,,,1,Masectomy | BCS,1,,
+LABC,,,,,,0,,,,1,Masectomy,1,,
+LABC,,,,,,,,,,0,None,,,
+LABC,,,,,,,,,,0,None,,,
+ABC,0,0,0,1,,,,,,,,,Anti-PD-L1 + taxane,
+ABC,0,0,0,0,,,,,,,,,Combination ChT,
+ABC,0,0,0,0,0,,,,,,,,Sequential single-agent ChT,
+ABC,0,0,0,,0,,,,,,,,Sequential single-agent ChT,
+ABC,0,0,0,,1,,,,,,,,PARPi,
+ABC,0,0,0,,,,,,,,,,Carboplatin | Anthracyclines | Taxanes,None
+ABC,0,0,0,0,,,,,,,,,Carboplatin | Erubilin | Vinorelbine | Capecitabine,Antracycline or Taxanes
+ABC,,1,,,,,,,,,,,,
